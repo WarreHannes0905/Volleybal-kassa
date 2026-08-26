@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    >
+
+    <meta name="theme-color" content="#1f4f3d">
+
+    <title>Volleybal Kassa</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.svg">
+</head>
+
+<body>
+
+    <header>
+        <div>
+            <h1>🏐 Volleybal Kassa</h1>
+            <p id="datum"></p>
+        </div>
+
+        <nav>
+            <button
+                class="navigatie-knop actief"
+                data-scherm="kassaScherm"
+            >
+                Kassa
+            </button>
+
+            <button
+                class="navigatie-knop"
+                data-scherm="overzichtScherm"
+            >
+                Sessies
+            </button>
+
+            <button
+                class="navigatie-knop"
+                data-scherm="beheerScherm"
+            >
+                Beheer
+            </button>
+        </nav>
+    </header>
+
+
+    <main>
+
+        <!-- ========================= -->
+        <!-- KASSA                     -->
+        <!-- ========================= -->
+
+        <section id="kassaScherm" class="scherm actief-scherm">
+
+            <div id="sessieBalk" class="sessie-balk">
+
+                <div>
+                    <span class="sessie-label">Kassasessie</span>
+                    <strong id="sessieStatusTekst">Geen actieve sessie</strong>
+                    <span id="sessieStartTekst" class="sessie-detail">
+                        Start eerst een sessie om verkopen te registreren.
+                    </span>
+                </div>
+
+                <div class="sessie-acties">
+                    <button
+                        id="startSessie"
+                        class="sessie-knop groen"
+                    >
+                        Sessie starten
+                    </button>
+
+                    <button
+                        id="sluitSessie"
+                        class="sessie-knop rood verborgen"
+                    >
+                        Sessie afsluiten
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="kassa-layout">
+
+                <div class="producten-gedeelte">
+
+                    <h2>Producten</h2>
+
+                    <div id="categorieFilters" class="categorie-filters">
+                    </div>
+
+                    <div id="producten" class="producten-grid">
+                    </div>
+
+                </div>
+
+
+                <aside class="bestelling-gedeelte">
+
+                    <h2>Bestelling</h2>
+
+                    <div id="legeBestelling" class="lege-bestelling">
+                        Nog geen producten geselecteerd.
+                    </div>
+
+                    <div id="bestelling">
+                    </div>
+
+                    <div class="totaal-blok">
+
+                        <span>Totaal</span>
+
+                        <strong>
+                            €<span id="totaal">0,00</span>
+                        </strong>
+
+                    </div>
+
+                    <button
+                        id="bestellingAfronden"
+                        class="grote-knop groen"
+                    >
+                        Bestelling afronden
+                    </button>
+
+                    <button
+                        id="bestellingLeegmaken"
+                        class="grote-knop secundair"
+                    >
+                        Bestelling leegmaken
+                    </button>
+
+                </aside>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- SESSIEOVERZICHT           -->
+        <!-- ========================= -->
+
+        <section id="overzichtScherm" class="scherm">
+
+            <h2>Sessieoverzicht</h2>
+
+            <div class="kaart sessie-info-kaart">
+                <div>
+                    <span class="sessie-label">Huidige sessie</span>
+                    <strong id="overzichtSessieTitel">Geen actieve sessie</strong>
+                    <span id="overzichtSessieTijd" class="sessie-detail"></span>
+                </div>
+            </div>
+
+            <div class="statistieken">
+
+                <div class="statistiek">
+                    <span>Bestellingen</span>
+                    <strong id="aantalBestellingen">0</strong>
+                </div>
+
+                <div class="statistiek">
+                    <span>Verkochte producten</span>
+                    <strong id="aantalVerkochteProducten">0</strong>
+                </div>
+
+                <div class="statistiek">
+                    <span>Totale omzet</span>
+                    <strong>
+                        €<span id="sessieOmzet">0,00</span>
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="kaart">
+
+                <h3>Verkoop per product</h3>
+
+                <div class="tabel-container">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Aantal</th>
+                                <th>Prijs</th>
+                                <th>Omzet</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="verkoopTabel">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <div class="actie-knoppen enkel">
+
+                <button
+                    id="exporteerCSV"
+                    class="grote-knop groen"
+                >
+                    CSV van actieve sessie downloaden
+                </button>
+
+            </div>
+
+
+            <div class="kaart historiek-kaart">
+
+                <h3>Vorige kassasessies</h3>
+
+                <p class="uitleg">
+                    Afgesloten sessies blijven hier bewaard. Je kunt hun CSV later opnieuw downloaden.
+                </p>
+
+                <div id="sessieHistoriek" class="sessie-historiek">
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- BEHEER                    -->
+        <!-- ========================= -->
+
+        <section id="beheerScherm" class="scherm">
+
+            <h2>Product- en voorraadbeheer</h2>
+
+            <p class="uitleg">
+                Hier kun je prijzen en actuele voorraad aanpassen.
+            </p>
+
+            <div id="beheerProducten" class="beheer-lijst">
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <div id="melding" class="melding">
+    </div>
+
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>

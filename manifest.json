@@ -1,0 +1,17 @@
+{
+    "name": "Volleybal Kantine Kassa",
+    "short_name": "Kantine",
+    "description": "Kassasysteem voor de volleybalkantine",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#f4f5f6",
+    "theme_color": "#1f4f3d",
+    "orientation": "landscape",
+    "icons": [
+        {
+            "src": "icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}
