@@ -1,5 +1,5 @@
 const CACHE_NAAM =
-    "volleybal-kassa-v3";
+    "volleybal-kassa-v5";
 
 
 const BESTANDEN = [

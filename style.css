@@ -692,3 +692,136 @@ th {
         width: 100%;
     }
 }
+
+/* =========================
+   AFGERONDE BESTELLINGEN
+   ========================= */
+
+.afgeronde-bestellingen-kaart {
+    margin-top: 20px;
+}
+
+.afgeronde-bestellingen {
+    display: grid;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.afgeronde-bestelling {
+    border: 1px solid #e1e4e8;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.afgeronde-bestelling-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.afgeronde-bestelling-info span {
+    color: #666;
+    font-size: 14px;
+}
+
+.bestelling-verwijder-knop {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    background: #b02a37;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.bestelling-verwijder-knop:hover {
+    background: #8f202c;
+}
+
+/* =========================
+   NIEUWE PRODUCTEN
+   ========================= */
+
+.nieuw-product-kaart {
+    margin-bottom: 20px;
+}
+
+.nieuw-product-form {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 1.5fr;
+    gap: 15px;
+    align-items: end;
+    margin-top: 15px;
+}
+
+.nieuw-product-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-weight: bold;
+}
+
+.nieuw-product-form input,
+.nieuw-product-form select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font-size: 16px;
+    width: 100%;
+    background: white;
+}
+
+.nieuw-product-kaart .grote-knop {
+    max-width: 300px;
+}
+
+
+
+.beheer-product-acties {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-self: end;
+}
+
+.verwijder-product-knop {
+    border: none;
+    border-radius: 10px;
+    padding: 0.65rem 0.9rem;
+    background: #b42318;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.verwijder-product-knop:hover {
+    opacity: 0.9;
+}
+
+.beheer-lijst-titel {
+    margin-top: 25px;
+}
+
+@media (max-width: 850px) {
+    .nieuw-product-form {
+        grid-template-columns: 1fr;
+    }
+
+    .nieuw-product-kaart .grote-knop {
+        max-width: none;
+    }
+
+    .afgeronde-bestelling {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .bestelling-verwijder-knop {
+        width: 100%;
+    }
+}

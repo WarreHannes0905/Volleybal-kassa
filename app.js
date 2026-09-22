@@ -629,6 +629,7 @@ function toonSessieOverzicht() {
         });
     }
 
+    toonAfgerondeBestellingen(sessie);
     toonSessieHistoriek();
 }
 
@@ -686,9 +687,149 @@ function toonSessieHistoriek() {
 // PRIJZEN BEHEREN — GEEN VOORRAAD MEER
 // ============================================================
 
+
+function krijgCategorieën() {
+    return [...new Set(producten.map(product => product.categorie).filter(Boolean))];
+}
+
+function voegNieuwProductToe() {
+    const naamInvoer = document.getElementById("nieuwProductNaam");
+    const prijsInvoer = document.getElementById("nieuwProductPrijs");
+    const categorieSelect = document.getElementById("nieuwProductCategorie");
+    const nieuweCategorieInvoer = document.getElementById("nieuweCategorieNaam");
+
+    const naam = naamInvoer.value.trim();
+    const prijsTekst = prijsInvoer.value.trim();
+    let categorie = categorieSelect.value;
+
+    if (categorie === "__nieuw__") {
+        categorie = nieuweCategorieInvoer.value.trim();
+    }
+
+    if (!naam) {
+        toonMelding("Vul een productnaam in.");
+        return;
+    }
+
+    const prijs = Number(prijsTekst);
+    if (prijsTekst === "" || Number.isNaN(prijs) || prijs < 0) {
+        toonMelding("Vul een geldige prijs in.");
+        return;
+    }
+
+    if (!categorie) {
+        toonMelding("Kies of maak een categorie.");
+        return;
+    }
+
+    const bestaatAl = producten.some(
+        product => product.naam.trim().toLowerCase() === naam.toLowerCase()
+    );
+
+    if (bestaatAl) {
+        toonMelding("Er bestaat al een product met deze naam.");
+        return;
+    }
+
+    const nieuwId = producten.reduce(
+        (hoogste, product) => Math.max(hoogste, Number(product.id) || 0),
+        0
+    ) + 1;
+
+    producten.push({
+        id: nieuwId,
+        naam,
+        categorie,
+        prijs: Math.round(prijs * 100) / 100
+    });
+
+    slaProductenOp();
+
+    naamInvoer.value = "";
+    prijsInvoer.value = "";
+    categorieSelect.value = categorie;
+    nieuweCategorieInvoer.value = "";
+    nieuweCategorieInvoer.classList.add("verborgen");
+    document.getElementById("nieuweCategorieLabel").classList.add("verborgen");
+
+    actieveCategorie = categorie;
+    toonCategorieën();
+    toonProducten();
+    toonBeheer();
+
+    toonMelding(`${naam} toegevoegd.`);
+}
+
 function toonBeheer() {
     const container = document.getElementById("beheerProducten");
     container.innerHTML = "";
+
+    const categorieën = krijgCategorieën();
+
+    const toevoegenKaart = document.createElement("div");
+    toevoegenKaart.className = "kaart nieuw-product-kaart";
+    toevoegenKaart.innerHTML = `
+        <h3>Nieuw product toevoegen</h3>
+        <p class="uitleg">
+            Voeg hier zelf een product toe. Het product verschijnt daarna meteen in de kassa.
+        </p>
+
+        <div class="nieuw-product-form">
+            <label>
+                Productnaam
+                <input id="nieuwProductNaam" type="text" placeholder="Bijv. Jupiler">
+            </label>
+
+            <label>
+                Categorie
+                <select id="nieuwProductCategorie">
+                    ${categorieën.map(categorie =>
+                        `<option value="${escapeHtml(categorie)}">${escapeHtml(categorie)}</option>`
+                    ).join("")}
+                    <option value="__nieuw__">+ Nieuwe categorie</option>
+                </select>
+            </label>
+
+            <label>
+                Prijs
+                <input id="nieuwProductPrijs" type="number" step="0.10" min="0" placeholder="€">
+            </label>
+
+            <label id="nieuweCategorieLabel" class="verborgen">
+                Nieuwe categorie
+                <input id="nieuweCategorieNaam" type="text" placeholder="Bijv. Desserts">
+            </label>
+        </div>
+
+        <button id="nieuwProductToevoegen" class="grote-knop groen">
+            Product toevoegen
+        </button>
+    `;
+
+    container.appendChild(toevoegenKaart);
+
+    const categorieSelect = toevoegenKaart.querySelector("#nieuwProductCategorie");
+    const nieuweCategorieLabel = toevoegenKaart.querySelector("#nieuweCategorieLabel");
+
+    categorieSelect.addEventListener("change", () => {
+        if (categorieSelect.value === "__nieuw__") {
+            nieuweCategorieLabel.classList.remove("verborgen");
+            toevoegenKaart.querySelector("#nieuweCategorieNaam").focus();
+        } else {
+            nieuweCategorieLabel.classList.add("verborgen");
+            toevoegenKaart.querySelector("#nieuweCategorieNaam").value = "";
+        }
+    });
+
+    toevoegenKaart.querySelector("#nieuwProductToevoegen").addEventListener(
+        "click",
+        voegNieuwProductToe
+    );
+
+    const lijstTitel = document.createElement("h3");
+    lijstTitel.textContent = "Bestaande producten en prijzen";
+    lijstTitel.className = "beheer-lijst-titel";
+    container.appendChild(lijstTitel);
 
     producten.forEach(product => {
         const rij = document.createElement("div");
@@ -696,9 +837,9 @@ function toonBeheer() {
 
         rij.innerHTML = `
             <div>
-                <strong>${product.naam}</strong>
+                <strong>${escapeHtml(product.naam)}</strong>
                 <br>
-                <small>${product.categorie}</small>
+                <small>${escapeHtml(product.categorie)}</small>
             </div>
 
             <label>
@@ -713,7 +854,10 @@ function toonBeheer() {
                 >
             </label>
 
-            <button class="opslaan-knop">Prijs opslaan</button>
+            <div class="beheer-product-acties">
+                <button class="opslaan-knop">Prijs opslaan</button>
+                <button class="verwijder-product-knop" type="button">Verwijderen</button>
+            </div>
         `;
 
         rij.querySelector(".opslaan-knop").addEventListener(
@@ -735,8 +879,122 @@ function toonBeheer() {
             }
         );
 
+        rij.querySelector(".verwijder-product-knop").addEventListener(
+            "click",
+            () => verwijderProduct(product.id)
+        );
+
         container.appendChild(rij);
     });
+}
+
+function escapeHtml(tekst) {
+    return String(tekst)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function verwijderVerkoop(verkoopId) {
+    const sessie = geefActieveSessie();
+
+    if (!sessie) {
+        toonMelding("Er is geen actieve kassasessie.");
+        return;
+    }
+
+    const index = sessie.verkopen.findIndex(
+        verkoop => String(verkoop.id) === String(verkoopId)
+    );
+
+    if (index === -1) {
+        toonMelding("Bestelling niet gevonden.");
+        return;
+    }
+
+    const verkoop = sessie.verkopen[index];
+    const akkoord = confirm(
+        `Wil je bestelling van ${verkoop.tijd} voor €${formatPrijs(verkoop.totaal)} verwijderen?\n\nDit kan niet ongedaan worden gemaakt.`
+    );
+
+    if (!akkoord) return;
+
+    sessie.verkopen.splice(index, 1);
+    slaSessiesOp();
+    toonSessieOverzicht();
+    toonMelding("Bestelling verwijderd.");
+}
+
+function toonAfgerondeBestellingen(sessie) {
+    const container = document.getElementById("afgerondeBestellingen");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    if (!sessie || sessie.verkopen.length === 0) {
+        container.innerHTML = `
+            <p class="geen-sessies">Nog geen afgeronde bestellingen in deze sessie.</p>
+        `;
+        return;
+    }
+
+    [...sessie.verkopen]
+        .sort((a, b) => new Date(b.tijdstip) - new Date(a.tijdstip))
+        .forEach(verkoop => {
+            const kaart = document.createElement("div");
+            kaart.className = "afgeronde-bestelling";
+
+            const productenTekst = verkoop.producten
+                .map(product => `${product.aantal}× ${escapeHtml(product.naam)}`)
+                .join(" • ");
+
+            kaart.innerHTML = `
+                <div class="afgeronde-bestelling-info">
+                    <strong>${escapeHtml(verkoop.tijd)}</strong>
+                    <span>${productenTekst}</span>
+                    <strong>€${formatPrijs(verkoop.totaal)}</strong>
+                </div>
+                <button class="bestelling-verwijder-knop">
+                    Verwijderen
+                </button>
+            `;
+
+            kaart.querySelector(".bestelling-verwijder-knop").addEventListener(
+                "click",
+                () => verwijderVerkoop(verkoop.id)
+            );
+
+            container.appendChild(kaart);
+        });
+}
+
+function verwijderProduct(productId) {
+    const product = producten.find(
+        item => String(item.id) === String(productId)
+    );
+
+    if (!product) {
+        toonMelding("Product niet gevonden.");
+        return;
+    }
+
+    const akkoord = confirm(
+        `Wil je \"${product.naam}\" verwijderen uit de productenlijst?\n\nDit verwijdert het product uit de kassa. Reeds geregistreerde verkopen blijven bewaard.`
+    );
+
+    if (!akkoord) return;
+
+    producten = producten.filter(
+        item => String(item.id) !== String(productId)
+    );
+
+    slaProductenOp();
+    toonCategorieFilters();
+    toonProducten();
+    toonBeheer();
+    toonMelding(`${product.naam} verwijderd.`);
 }
 
 
